@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Plan de Entrenamiento - Visor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #1a1a2e;
+            background-image: url('./fondo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: repeat;
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+        .viewer-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .plan-header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 28px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .plan-header h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #000;
+            text-align: center;
+            border-bottom: 4px solid #000;
+            display: inline-block;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+        .plan-header .header-center { text-align: center; }
+        .plan-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .meta-item {
+            flex: 1;
+            min-width: 200px;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+        .meta-item label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .meta-item .value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .note-box {
+            background: #fef9e3;
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            border: 1px solid #fcd34d;
+        }
+        /* Definitions */
+        .definitions-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .definitions-card h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #f97316;
+            border-left: 5px solid #f97316;
+            padding-left: 12px;
+            margin-bottom: 16px;
+        }
+        .def-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .def-item {
+            flex: 1;
+            min-width: 240px;
+            background: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+        }
+        .def-item strong {
+            color: #f97316;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .def-item p {
+            font-size: 0.8rem;
+            color: #334155;
+            line-height: 1.4;
+        }
+        /* Day cards */
+        .day-card {
+            background: rgba(255,255,255,0.90);
+            border-radius: 24px;
+            margin-bottom: 24px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .day-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .exercise-card {
+            background: rgba(255,255,255,0.6);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .exercise-card h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        .vars-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+        }
+        .var-chip {
+            flex: 1;
+            min-width: 80px;
+        }
+        .var-chip label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #475569;
+            display: block;
+        }
+        .var-chip .val {
+            padding: 6px 8px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-top: 3px;
+        }
+        .video-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 14px;
+            background: #e6f0ff;
+            border-radius: 40px;
+            color: #1e40af;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid #3b82f6;
+        }
+        .video-link:hover { background: #dbeafe; }
+        /* Footer */
+        .plan-footer {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 20px;
+        }
+        .plan-footer a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        /* Social */
+        .social-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .social-btn {
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .social-wa { background: #25D366; }
+        .social-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #fff;
+        }
+        .loading h2 { font-size: 1.4rem; margin-bottom: 12px; }
+        .error-msg {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 600px;
+            margin: 60px auto;
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .plan-header, .day-card, .definitions-card { padding: 16px; border-radius: 18px; }
+            .plan-header h1 { font-size: 1.2rem; }
+            .day-card h3 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="viewer-container" id="viewerRoot">
+        <div class="loading" id="loadingMsg">
+            <h2>🏋️ Cargando plan de entrenamiento...</h2>
+            <p>Espera un momento</p>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        const root = document.getElementById('viewerRoot');
+        const loadingMsg = document.getElementById('loadingMsg');
+
+        // 1. Leer datos del hash
+        const hash = window.location.hash;
+        if (!hash || !hash.includes('data=')) {
+            loadingMsg.innerHTML = '<div class="error-msg"><h3>❌ No se encontró un plan</h3><p>Este link no contiene datos de un plan de entrenamiento. Pide a tu entrenador que te envíe el link correcto.</p></div>';
+            return;
+        }
+
+        const dataStr = hash.split('data=')[1];
+        let jsonStr;
+        try {
+            // Intentar descomprimir con LZString
+            if (typeof LZString !== 'undefined') {
+                jsonStr = LZString.decompressFromEncodedURIComponent(dataStr);
+            }
+            // Fallback: base64
+            if (!jsonStr || jsonStr.length < 10) {
+                jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(dataStr))));
+            }
+        } catch(e) {
+            try {
+                jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(dataStr))));
+            } catch(e2) {
+                loadingMsg.innerHTML = '<div class="error-msg"><h3>❌ Error al cargar el plan</h3><p>Los datos del link están corruptos. Pide a tu entrenador que genere un nuevo link.</p></div>';
+                return;
+            }
+        }
+
+        let plan;
+        try {
+            plan = JSON.parse(jsonStr);
+        } catch(e) {
+            loadingMsg.innerHTML = '<div class="error-msg"><h3>❌ Error al leer el plan</h3><p>El formato de datos no es válido.</p></div>';
+            return;
+        }
+
+        // 2. Renderizar el plan
+        document.title = 'Plan de Entrenamiento - ' + (plan.userName || 'Personalizado');
+
+        function esc(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        let html = '';
+
+        // Header
+        html += '<div class="plan-header">';
+        html += '<div class="header-center"><h1>PLAN DE ENTRENAMIENTO PERSONALIZADO</h1></div>';
+        html += '<div class="plan-meta">';
+        if (plan.userName) html += '<div class="meta-item"><label>🏷️ Dirigido a</label><div class="value">' + esc(plan.userName) + '</div></div>';
+        if (plan.userGoal) html += '<div class="meta-item"><label>🎯 Objetivo</label><div class="value">' + esc(plan.userGoal) + '</div></div>';
+        if (plan.startDate) html += '<div class="meta-item"><label>📅 Fecha inicio</label><div class="value">' + esc(plan.startDate) + '</div></div>';
+        if (plan.trainerName) html += '<div class="meta-item"><label>✍️ Elaborado por</label><div class="value">' + esc(plan.trainerName) + '</div></div>';
+        html += '</div>';
+        if (plan.globalNote) html += '<div class="note-box">' + esc(plan.globalNote) + '</div>';
+        
+        // Social
+        if (plan.whatsappLink || plan.instagramLink) {
+            html += '<div class="social-bar">';
+            if (plan.whatsappLink) html += '<a href="' + esc(plan.whatsappLink) + '" target="_blank" class="social-btn social-wa">📱 WhatsApp</a>';
+            if (plan.instagramLink) html += '<a href="' + esc(plan.instagramLink) + '" target="_blank" class="social-btn social-ig">📸 Instagram</a>';
+            html += '</div>';
+        }
+        html += '</div>';
+
+        // Definitions
+        if (plan.globalVariables && plan.variableDefinitions) {
+            const defs = plan.globalVariables.filter(v => plan.variableDefinitions[v.id]);
+            if (defs.length > 0) {
+                html += '<div class="definitions-card">';
+                html += '<h2>📖 Diccionario de variables</h2>';
+                html += '<div class="def-grid">';
+                defs.forEach(v => {
+                    html += '<div class="def-item"><strong>🏷️ ' + esc(v.label) + '</strong><p>' + esc(plan.variableDefinitions[v.id]) + '</p></div>';
+                });
+                html += '</div></div>';
+            }
+        }
+
+        // Days
+        if (plan.trainingDays) {
+            plan.trainingDays.forEach(day => {
+                html += '<div class="day-card">';
+                html += '<h3>' + esc(day.name) + '</h3>';
+                if (day.exercises) {
+                    day.exercises.forEach(ex => {
+                        html += '<div class="exercise-card">';
+                        html += '<h4>' + esc(ex.name) + '</h4>';
+                        // Variables
+                        if (ex.variables && plan.globalVariables) {
+                            html += '<div class="vars-row">';
+                            plan.globalVariables.forEach(v => {
+                                const val = ex.variables[v.id];
+                                if (val !== undefined && val !== '') {
+                                    html += '<div class="var-chip"><label>' + esc(v.label) + '</label><div class="val">' + esc(val) + '</div></div>';
+                                }
+                            });
+                            html += '</div>';
+                        }
+                        // Video
+                        if (ex.videoUrl) {
+                            html += '<a href="' + esc(ex.videoUrl) + '" target="_blank" rel="noopener noreferrer" class="video-link">🎬 Ver video</a>';
+                        }
+                        html += '</div>';
+                    });
+                }
+                html += '</div>';
+            });
+        }
+
+        // Footer
+        html += '<div class="plan-footer">';
+        if (plan.trainerName) html += '<p>Plan elaborado por <strong>' + esc(plan.trainerName) + '</strong></p>';
+        html += '<p style="margin-top:6px">🏋️ Hecho con Plan de Entrenamiento Profesional</p>';
+        html += '</div>';
+
+        loadingMsg.remove();
+        root.innerHTML = html;
+    })();
+    </script>
+</body>
+</html>

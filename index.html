@@ -530,6 +530,13 @@
         padding: 8px 14px !important;
     }
 }
+
+/* Fix para iPhone/Móviles: el fondo fijo causa errores de renderizado en iOS (zoom, scroll saltos) */
+@media only screen and (max-device-width: 1024px) {
+    body {
+        background-attachment: scroll !important;
+    }
+}
     </style>
 <script>
     window.onbeforeprint = function() {

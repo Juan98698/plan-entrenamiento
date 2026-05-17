@@ -1040,160 +1040,41 @@ function addGlobalVariable() {
     }
 	
     function exportToHtml() {
-    const originalContainer = document.getElementById('trainingPlanContainer');
-    
-    // 1. Sincronizar valores actuales de inputs y textareas al atributo value
-    originalContainer.querySelectorAll('input, textarea').forEach(el => {
-        if (el.value !== undefined) {
-            el.setAttribute('value', el.value);
+        // 1. Sincronizar valores actuales de inputs y textareas al atributo value
+        document.querySelectorAll('input, textarea').forEach(el => {
+            if (el.value !== undefined) el.setAttribute('value', el.value);
+            if (el.tagName === 'TEXTAREA') el.innerHTML = el.value;
+        });
+
+        // 2. Guardar el estado JSON en un script en el head
+        let stateScript = document.getElementById('saved-state');
+        if (!stateScript) {
+            stateScript = document.createElement('script');
+            stateScript.id = 'saved-state';
+            document.head.appendChild(stateScript);
         }
-        if (el.tagName === 'TEXTAREA') {
-            el.innerHTML = el.value;
-        }
-    });
-    
-    // 2. Clonar el contenedor ya con los atributos actualizados
-    const cloneContainer = originalContainer.cloneNode(true);
-    
-    // 3. Eliminar elementos de edición (toolbars, botones, etc.)
-    const toolbars = cloneContainer.querySelectorAll('.toolbar, .add-day-btn, .btn-remove-day, .exercise-actions, .btn-add-ex, .btn-rem-ex, .img-upload-label, .global-vars-panel button, #quickAddVarBtn, .remove-var-btn, .hidden-file-upload');
-    toolbars.forEach(el => el.remove());
-    
-    // 4. Asegurar enlaces externos
-    cloneContainer.querySelectorAll('a').forEach(link => {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-    });
-    
-    // 5. Obtener estilos
-    const styles = document.querySelector('style').innerHTML;
-    
-    // 6. Generar HTML final CON botón de exportar solo lectura y su JS
-    const fullHtml = `<!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-        <title>Plan Entrenamiento Personalizado</title>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-        <style>${styles}</style>
-        <style>
-            /* Ocultar elementos de edición en la versión exportada */
-            .toolbar, .add-day-btn, .btn-remove-day, .exercise-actions, .btn-add-ex, 
-            .btn-rem-ex, .img-upload-label, .global-vars-panel button, 
-            #quickAddVarBtn, .remove-var-btn, .hidden-file-upload {
-                display: none !important;
-            }
-            body {
-                padding: 20px;
-                background-color: #1a1a2e;
-            }
-            .document-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                background: rgba(255,255,255,0.0);
-                border-radius: 28px;
-                padding: 30px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            }
-            /* Mini toolbar para exportar solo lectura */
-            .export-toolbar {
-                position: sticky;
-                top: 10px;
-                z-index: 100;
-                text-align: center;
-                margin-bottom: 20px;
-                background: #1e293b;
-                padding: 12px 24px;
-                border-radius: 60px;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            }
-            .export-toolbar button {
-                background: #10b981;
-                border: none;
-                color: white;
-                padding: 10px 22px;
-                border-radius: 40px;
-                font-weight: 700;
-                font-size: 0.9rem;
-                cursor: pointer;
-                margin: 4px 8px;
-                transition: all 0.2s;
-                font-family: 'Inter', sans-serif;
-            }
-            .export-toolbar button:hover {
-                background: #059669;
-                transform: scale(0.96);
-            }
-            .export-toolbar button.btn-pdf {
-                background: #3b82f6;
-            }
-            .export-toolbar button.btn-pdf:hover {
-                background: #2563eb;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="export-toolbar">
-            <button onclick="exportReadOnly()">🔒 Exportar para cliente (solo lectura)</button>
-            <button class="btn-pdf" onclick="window.print()">🖨️ Exportar PDF</button>
-        </div>
-        ${cloneContainer.outerHTML}
-        <script>
-        function exportReadOnly() {
-            const container = document.querySelector('.document-container') || document.querySelector('#trainingPlanContainer');
-            if (!container) { alert('No se encontró el plan'); return; }
-            container.querySelectorAll('input, textarea').forEach(function(el) {
-                if (el.value !== undefined) el.setAttribute('value', el.value);
-                if (el.tagName === 'TEXTAREA') el.innerHTML = el.value;
-            });
-            var clone = container.cloneNode(true);
-            clone.querySelectorAll('button, .export-toolbar').forEach(function(el) { el.remove(); });
-            clone.querySelectorAll('input').forEach(function(el) {
-                var div = document.createElement('div');
-                div.style.cssText = 'padding:8px 12px; background:#f5f5f5; border-radius:12px; border:1px solid #ddd; font-size:0.9rem; color:#000;';
-                div.textContent = el.value || '(sin definir)';
-                el.parentNode.replaceChild(div, el);
-            });
-            clone.querySelectorAll('textarea').forEach(function(el) {
-                var div = document.createElement('div');
-                div.style.cssText = 'padding:8px 12px; background:#f5f5f5; border-radius:12px; border:1px solid #ddd; font-size:0.9rem; white-space:pre-wrap; color:#000;';
-                div.textContent = el.value || '';
-                el.parentNode.replaceChild(div, el);
-            });
-            clone.querySelectorAll('a').forEach(function(a) {
-                a.setAttribute('target', '_blank');
-                a.setAttribute('rel', 'noopener noreferrer');
-            });
-            var allStyles = '';
-            document.querySelectorAll('style').forEach(function(s) { allStyles += s.innerHTML; });
-            var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"><title>Plan Entrenamiento - Solo Lectura</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"><style>' + allStyles + ' button,.toolbar,.export-toolbar,.add-day-btn,.btn-remove-day,.exercise-actions{display:none!important} input,textarea{pointer-events:none!important;background-color:#fafafa!important;color:#000!important;border-color:#ccc!important} body{padding:20px;background-color:#1a1a2e}</style></head><body><div style="max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.0);border-radius:28px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1)">' + clone.innerHTML + '</div></body></html>';
-            var blob = new Blob([html], {type:'text/html'});
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'plan_entrenamiento_cliente.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        ${'<'}${'/script>'}
-    </body>
-    </html>`;
-    
-    
-    // 7. Descargar
-    const blob = new Blob([fullHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'plan_entrenamiento.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+        const state = {
+            globalVariables: globalVariables,
+            variableDefinitions: variableDefinitions,
+            trainingDays: trainingDays
+        };
+        // Evitamos usar caracteres problemáticos dentro del string para no romper el HTML final
+        stateScript.textContent = "window.__SAVED_STATE__ = " + JSON.stringify(state).replace(/</g, '\\u003c') + ";";
+
+        // 3. Obtener el HTML de toda la página
+        const fullHtml = '<!DOCTYPE html>\n<html lang="es">\n' + document.documentElement.innerHTML + '\n</html>';
+        
+        // 4. Descargar el archivo
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'plan_entrenamiento_editable.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 function exportToReadOnlyHtml() {
     const originalContainer = document.getElementById('trainingPlanContainer');
     
@@ -1331,6 +1212,11 @@ staticText.innerHTML = (value || '(Sin definir)').replace(/\n/g, '<br>');
 
     // Inicialización
     function init() {
+        if (window.__SAVED_STATE__) {
+            globalVariables = window.__SAVED_STATE__.globalVariables;
+            variableDefinitions = window.__SAVED_STATE__.variableDefinitions;
+            trainingDays = window.__SAVED_STATE__.trainingDays;
+        }
         renderFullApp();
         const printBtn = document.getElementById('printAsPdfBtn');
         if (printBtn) printBtn.onclick = printToPdf;

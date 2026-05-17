@@ -1091,7 +1091,7 @@ function addGlobalVariable() {
             .document-container {
                 max-width: 1200px;
                 margin: 0 auto;
-                background: rgba(255,255,255,0.95);
+                background: rgba(255,255,255,0.0);
                 border-radius: 28px;
                 padding: 30px;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -1167,7 +1167,7 @@ function addGlobalVariable() {
             });
             var allStyles = '';
             document.querySelectorAll('style').forEach(function(s) { allStyles += s.innerHTML; });
-            var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"><title>Plan Entrenamiento - Solo Lectura</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"><style>' + allStyles + ' button,.toolbar,.export-toolbar,.add-day-btn,.btn-remove-day,.exercise-actions{display:none!important} input,textarea{pointer-events:none!important;background-color:#fafafa!important;color:#000!important;border-color:#ccc!important} body{padding:20px;background-color:#1a1a2e}</style></head><body><div style="max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.95);border-radius:28px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1)">' + clone.innerHTML + '</div></body></html>';
+            var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"><title>Plan Entrenamiento - Solo Lectura</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"><style>' + allStyles + ' button,.toolbar,.export-toolbar,.add-day-btn,.btn-remove-day,.exercise-actions{display:none!important} input,textarea{pointer-events:none!important;background-color:#fafafa!important;color:#000!important;border-color:#ccc!important} body{padding:20px;background-color:#1a1a2e}</style></head><body><div style="max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.0);border-radius:28px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.1)">' + clone.innerHTML + '</div></body></html>';
             var blob = new Blob([html], {type:'text/html'});
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
@@ -1312,7 +1312,7 @@ staticText.innerHTML = (value || '(Sin definir)').replace(/\n/g, '<br>');
         </style>
     </head>
     <body>
-        <div class="document-container" style="max-width:1200px; margin:0 auto; background:white; border-radius:28px; padding:30px;">
+        <div class="document-container" style="max-width:1200px; margin:0 auto; background:rgba(255,255,255,0.0); border-radius:28px; padding:30px;">
             ${cloneContainer.innerHTML}
         </div>
     </body>

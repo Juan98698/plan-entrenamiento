@@ -531,8 +531,8 @@
     }
 }
 
-/* Fix para iPhone/Móviles: el fondo fijo causa errores de renderizado en iOS (zoom, scroll saltos) */
-@media only screen and (max-device-width: 1024px) {
+/* Fix Definitivo para iOS (Safari/iPhone/iPad): iOS tiene un bug crónico con 'fixed' que hace que el fondo desaparezca o salte. */
+@supports (-webkit-touch-callout: none) {
     body {
         background-attachment: scroll !important;
     }

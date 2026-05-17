@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Plan de Entrenamiento Profesional - Editor Completo</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -18,7 +17,7 @@
           }
         body {
     background-color: #1a1a2e;
-    background-image: url('./fondo.jpg');
+    background-image: url('https://juan98698.github.io/plan-entrenamiento/fondo.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed !important;
@@ -551,7 +550,6 @@
         <button id="addCustomVarBtn">➕ Añadir variable global</button>
 	<button id="exportHtmlBtn" class="btn-print">🌐 Exportar a HTML (móvil)</button>
 	<button id="exportReadOnlyHtmlBtn" class="btn-print">🔒 Exportar HTML (solo lectura)</button>
-	<button id="shareWhatsAppBtn" style="background:#25D366; border:none; color:white; padding:8px 18px; border-radius:40px; font-weight:600; font-size:0.85rem; cursor:pointer;">📲 Compartir link por WhatsApp</button>
 <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e2e8f0; font-size: 0.75rem; color: #64748b;">
     🏋️ Plan generado con 💪 | wwwSERE.tuweb.com | No es el gimnasio, no es la rutina, no es el entrenador, eres tú.
 </div>	
@@ -1331,62 +1329,6 @@ staticText.innerHTML = (value || '(Sin definir)').replace(/\n/g, '<br>');
     URL.revokeObjectURL(url);
 }
 
-    // ---- COMPARTIR POR WHATSAPP ----
-    function shareViaWhatsApp() {
-        // Recopilar datos del plan
-        const originalContainer = document.getElementById('trainingPlanContainer');
-        originalContainer.querySelectorAll('input, textarea').forEach(el => {
-            if (el.value !== undefined) el.setAttribute('value', el.value);
-            if (el.tagName === 'TEXTAREA') el.innerHTML = el.value;
-        });
-        
-        const planData = {
-            userName: document.getElementById('userName') ? document.getElementById('userName').value : '',
-            userGoal: document.getElementById('userGoal') ? document.getElementById('userGoal').value : '',
-            startDate: document.getElementById('startDate') ? document.getElementById('startDate').value : '',
-            trainerName: document.getElementById('trainerName') ? document.getElementById('trainerName').value : '',
-            whatsappLink: document.getElementById('whatsappLink') ? document.getElementById('whatsappLink').value : '',
-            instagramLink: document.getElementById('instagramLink') ? document.getElementById('instagramLink').value : '',
-            globalNote: document.getElementById('globalNote') ? document.getElementById('globalNote').value : '',
-            globalVariables: globalVariables,
-            variableDefinitions: variableDefinitions,
-            trainingDays: trainingDays.map(day => ({
-                id: day.id,
-                name: day.name,
-                exercises: day.exercises.map(ex => ({
-                    id: ex.id,
-                    name: ex.name,
-                    videoUrl: ex.videoUrl || '',
-                    variables: ex.variables
-                    // imageData excluido intencionalmente (muy pesado para URL)
-                }))
-            }))
-        };
-        
-        const jsonStr = JSON.stringify(planData);
-        
-        // Comprimir con LZString si está disponible
-        let encoded;
-        if (typeof LZString !== 'undefined') {
-            encoded = LZString.compressToEncodedURIComponent(jsonStr);
-        } else {
-            encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
-        }
-        
-        const viewerUrl = 'https://juan98698.github.io/plan-entrenamiento/viewer.html#data=' + encoded;
-        
-        // Verificar tamaño
-        if (viewerUrl.length > 8000) {
-            alert('⚠️ El plan es muy grande para compartir por link. Usa "Exportar HTML (solo lectura)" para descargarlo como archivo.');
-            return;
-        }
-        
-        const nombre = planData.userName || 'tu';
-        const mensaje = encodeURIComponent('💪 ¡Hola! Aquí tienes tu plan de entrenamiento personalizado:\n\n' + viewerUrl);
-        const waUrl = 'https://wa.me/?text=' + mensaje;
-        window.open(waUrl, '_blank');
-    }
-
     // Inicialización
     function init() {
         renderFullApp();
@@ -1400,9 +1342,6 @@ staticText.innerHTML = (value || '(Sin definir)').replace(/\n/g, '<br>');
 
 	const exportReadOnlyBtn = document.getElementById('exportReadOnlyHtmlBtn');
         if (exportReadOnlyBtn) exportReadOnlyBtn.onclick = exportToReadOnlyHtml;
-
-	const shareWABtn = document.getElementById('shareWhatsAppBtn');
-        if (shareWABtn) shareWABtn.onclick = shareViaWhatsApp;
 
         // Delegación para eliminar variables
         document.addEventListener('click', function(e) {
